@@ -1,0 +1,170 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+
+int h3 = 0;
+
+
+struct circle{
+	int x;
+	int y;
+	int r;
+};
+
+
+typedef struct TreeNode TreeNode;
+//typedef struct TreeNode* ptrTreeNode;
+struct TreeNode{
+	struct circle circle;
+	vector <TreeNode*> child;
+};
+
+
+
+bool circleCompare(const circle& i, const circle& j){
+	return i.r > j.r;
+}
+
+int getLongestDis(TreeNode* tree){
+	
+	int h = 0;
+	unsigned int i;
+	int h1 = 0;
+	int h2 = 0;
+	int temp = 0;
+	int r = tree->child.size();
+	for (i = 0; i < tree->child.size(); i++){
+		h = getLongestDis(tree->child[i]);
+		
+		if (h1 < h){
+			h2 = h1;
+			h1 = h;
+		}
+		else if (h2 < h)
+			h2 = h;
+	}
+	
+	if (h3 < h1 + h2)
+		h3 = h1 + h2;
+
+	//printf("%d\n", h3);
+
+	return h1 + 1;
+}
+
+
+int isChild(struct TreeNode *root, struct TreeNode * insertNode){
+	
+	int a, b,c,result;
+	int distance;
+	int result1;
+	a = (root->circle.x) - (insertNode->circle.x);
+	b = (root->circle.y) - (insertNode->circle.y);
+	c = (root->circle.r);
+	distance = a*a + b*b;
+	result = c*c - distance;
+	//result1 = root->circle.r > insertNode->circle.r;
+
+	if (result < 0 )
+		return false;
+
+	else
+		return true;
+	
+}
+
+
+void insertTree(struct TreeNode *root, struct TreeNode *insertNode){
+
+	unsigned int i;
+	int r = root->child.size();
+	for (i = 0; i < root->child.size(); i++){
+		if (isChild(root->child[i], insertNode)){
+
+			//root->child.push_back(temp);
+			insertTree(root->child[i], insertNode);
+			return;
+		}
+
+	}
+		root->child.push_back(insertNode);
+
+	//return temp;
+	
+}
+
+
+
+int main(void){
+	
+	int Test_case;
+	int N;
+	int z;			//마지막 방지용
+	TreeNode *temp[100];
+
+
+	struct circle circle[100];
+	scanf("%d", &Test_case);
+
+
+
+	for (int i = 1; i <= Test_case; i++){
+		h3 = 0;
+		scanf("%d", &N);
+		TreeNode *root = new TreeNode();
+
+		scanf("%d%d%d", &root->circle.x, &root->circle.y, &root->circle.r);
+
+		for (int i = 0; i < N - 1; i++){
+			scanf("%d%d%d", &circle[i].x, &circle[i].y, &circle[i].r);
+		}
+
+
+		sort(circle, circle + (N-1), circleCompare);
+
+
+		//printf("%d %d %d \n", root->circle.x, root->circle.y, root->circle.r);
+
+	//	for (int i = 0; i < N - 1; i++)
+		//	printf("%d %d %d\n", circle[i].x, circle[i].y, circle[i].r);
+
+		for (int i = 0; i < N - 1; i++){
+			//TreeNode * temp = new TreeNode();
+			temp[i] = new TreeNode();
+			temp[i]->circle = circle[i];
+			insertTree(root, temp[i]);
+		}
+
+		getLongestDis(root);
+		printf("%d\n", h3);
+
+		/*
+		if (h3 > 2){
+		printf("%d %d %d\n", root->child[0]->circle.x, root->child[0]->circle.y, root->child[0]->circle.r);
+		printf("%d %d %d\n", root->child[0]->child[0]->circle.x, root->child[0]->child[0]->circle.y, root->child[0]->child[0]->circle.r);
+		printf("%d %d %d\n", root->child[0]->child[1]->circle.x, root->child[0]->child[1]->circle.y, root->child[0]->child[1]->circle.r);
+		printf("%d %d %d\n", root->child[0]->child[0]->child[0]->circle.x, root->child[0]->child[0]->child[0]->circle.y, root->child[0]->child[0]->child[0]->circle.r);
+		printf("%d %d %d\n", root->child[1]->circle.x, root->child[1]->circle.y, root->child[1]->circle.r);
+
+		printf("%d %d %d\n", root->child[2]->circle.x, root->child[2]->circle.y, root->child[2]->circle.r);
+		printf("%d %d %d\n", root->child[1]->child[0]->circle.x, root->child[1]->child[0]->circle.y, root->child[1]->child[0]->circle.r);
+		//printf("%d %d %d", root->circle.x, root->circle.y, root->circle.r);
+		
+	}*/
+
+		for (int i = 0; i < N - 1; i++)
+			free(temp[i]);
+		free(root);
+		
+
+	}
+
+	
+	//scanf("%d", &z);
+
+	return 0;
+}
