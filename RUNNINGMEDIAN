@@ -1,0 +1,68 @@
+//#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <queue>
+#include <functional>
+using namespace std;
+
+int A[200000];
+
+
+void makeArray(int num, int first, int second)
+{
+	for (int i = 1; i <= num; ++i){
+		A[i] = ((A[i - 1] * (long long)first) + second)% 20090711;
+		//printf("%d\n", A[i - 1]);
+	}
+		
+
+}
+
+
+int runningMedian(int n){
+	priority_queue<int, vector<int>, less<int> > maxHeap;
+	priority_queue<int, vector<int>, greater<int> > minHeap;
+	int ret = 0;
+
+	for (int i = 0; i < n; ++i){
+		if (maxHeap.size() == minHeap.size())
+			maxHeap.push(A[i]);
+		else
+			minHeap.push(A[i]);
+		if (!minHeap.empty() && !maxHeap.empty() && minHeap.top() < maxHeap.top()){
+			int a = maxHeap.top();
+			int b = minHeap.top();
+			maxHeap.pop();
+			minHeap.pop();
+			maxHeap.push(b);
+			minHeap.push(a);
+		}
+		//printf("%d %d\n", i, maxHeap.top());
+		ret = (ret + maxHeap.top()) % 20090711;
+		
+	}
+	return ret;
+}
+
+
+
+
+int main(void)
+{
+	int Test_Case;
+	int N;
+	int a, b,result;
+	A[0] = 1983;
+
+	scanf("%d", &Test_Case);
+	for (int i = 1; i <= Test_Case; i++){
+		scanf("%d%d%d",&N, &a, &b);
+		
+		makeArray(N, a, b);				//주어진 정보를 통해 수열 만들기
+		result = runningMedian(N);
+		printf("%d\n",result);
+
+	}
+
+
+	return 0;
+}
